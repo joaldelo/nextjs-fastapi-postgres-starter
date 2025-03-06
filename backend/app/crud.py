@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 import logging
 
-from models import User, Thread, Message
-from schemas import ThreadCreate, MessageCreate
+from app.models import User, Thread, Message
+from app.schemas import ThreadCreate, MessageCreate
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

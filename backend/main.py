@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from seed import seed_user_if_needed
-from api import router as api_router
+from app.api import router as api_router
 from fastapi.middleware.cors import CORSMiddleware
 
 seed_user_if_needed()

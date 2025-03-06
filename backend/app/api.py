@@ -3,15 +3,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import logging
 
-from db_engine import get_db
-from models import User, Thread, Message
-from schemas import  User, ThreadCreate, Thread, MessageCreate, Message
-from crud import (
+from app.db import get_db
+from app.models import User, Thread, Message
+from app.schemas import User, ThreadCreate, Thread, MessageCreate, Message
+from app.crud import (
     get_user, get_user_threads,
     get_thread, create_thread, get_thread_messages,
-    create_message
+    create_message, get_user_by_name
 )
-from chatbot import SimpleChatbot
+from app.chatbot import SimpleChatbot
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,8 +20,20 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 chatbot = SimpleChatbot()
 
-
- 
+@router.post("/users/", response_model=User)
+def create_user(user: User, db: Session = Depends(get_db)):
+    try:
+        db_user = get_user_by_name(db, name=user.name)
+        if db_user:
+            raise HTTPException(status_code=400, detail="User already exists")
+        db_user = User(**user.model_dump())
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except Exception as e:
+        logger.error(f"Failed to create user: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create user")
 
 @router.get("/users/{user_id}", response_model=User)
 def read_user(user_id: int, db: Session = Depends(get_db)):
