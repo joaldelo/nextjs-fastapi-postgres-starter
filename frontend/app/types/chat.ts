@@ -14,7 +14,7 @@ export interface Thread {
 }
 
 export interface Message {
-  id: number;
+  id: number | string;
   thread_id: number;
   content: string;
   role: string;

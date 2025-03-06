@@ -4,6 +4,25 @@ interface MessageListProps {
   messages: Message[];
 }
 
+function formatDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
+}
+
 export function MessageList({ messages }: MessageListProps) {
   return (
     <div className="flex flex-col space-y-4 p-4">
@@ -21,7 +40,7 @@ export function MessageList({ messages }: MessageListProps) {
           </div>
           <p className="text-gray-900">{message.content}</p>
           <span className="text-xs text-gray-600 mt-1 block">
-            {new Date(message.created_at).toLocaleString()}
+            {formatDate(message.created_at)}
           </span>
         </div>
       ))}
