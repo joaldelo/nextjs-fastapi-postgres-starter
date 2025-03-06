@@ -11,12 +11,14 @@ from crud import (
     get_thread, create_thread, get_thread_messages,
     create_message
 )
+from chatbot import SimpleChatbot
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+chatbot = SimpleChatbot()
 
 
  
@@ -74,8 +76,23 @@ def create_new_message(thread_id: int, message: MessageCreate, db: Session = Dep
         if db_thread is None:
             raise HTTPException(status_code=404, detail="Thread not found")
         
+        # Create user message
         db_message = create_message(db, message, thread_id)
-        logger.info(f"Created new message in thread {thread_id}")
+        logger.info(f"Created new user message in thread {thread_id}")
+        
+        # Get conversation history
+        conversation_history = get_thread_messages(db, thread_id)
+        history_dict = [{"role": msg.role, "content": msg.content} for msg in conversation_history]
+        
+        # Generate and create bot response
+        bot_response = chatbot.generate_response(message.content, history_dict)
+        bot_message = MessageCreate(
+            content=bot_response,
+            role="assistant"
+        )
+        db_bot_message = create_message(db, bot_message, thread_id)
+        logger.info(f"Created bot response in thread {thread_id}")
+        
         return db_message
     except Exception as e:
         logger.error(f"Failed to create message: {str(e)}")
