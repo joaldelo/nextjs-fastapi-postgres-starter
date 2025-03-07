@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "backend"
 version = "0.1.0"
-description = ""
+description = "Backend API for chatbot application"
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">3.7"
@@ -12,8 +13,13 @@ sqlalchemy = "*"
 asyncpg = "*"
 greenlet = "*"
 psycopg2 = "*"
-uvicorn = "*"
+uvicorn = {extras = ["standard"], version = "*"}
+pydantic = "*"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+httpx = "*"
+pytest-asyncio = "*"
 
 [build-system]
 requires = ["poetry-core"]

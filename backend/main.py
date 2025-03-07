@@ -1,29 +1,30 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from sqlalchemy import select
+from fastapi import FastAPI, WebSocket
 from seed import seed_user_if_needed
-from sqlalchemy.ext.asyncio import AsyncSession
-from db_engine import engine
-from models import User
+from app.api import router as api_router
+from app.websocket import handle_websocket
+from fastapi.middleware.cors import CORSMiddleware
 
 seed_user_if_needed()
 
-app = FastAPI()
+app = FastAPI(title="Chatbot API", description="Backend API for chatbot application")
 
+# Add CORS middleware configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], #TODO: Change to specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-class UserRead(BaseModel):
-    id: int
-    name: str
+# Include the API router
+app.include_router(api_router, prefix="/api/v1", tags=["chatbot"])
 
+# WebSocket endpoint
+@app.websocket("/ws/threads/{thread_id}")
+async def websocket_endpoint(websocket: WebSocket, thread_id: int):
+    await handle_websocket(websocket, thread_id)
 
-@app.get("/users/me")
-async def get_my_user():
-    async with AsyncSession(engine) as session:
-        async with session.begin():
-            # Sample logic to simplify getting the current user. There's only one user.
-            result = await session.execute(select(User))
-            user = result.scalars().first()
-
-            if user is None:
-                raise HTTPException(status_code=404, detail="User not found")
-            return UserRead(id=user.id, name=user.name)
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Chatbot API"}
