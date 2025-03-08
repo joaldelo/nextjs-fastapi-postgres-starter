@@ -7,19 +7,20 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = ">3.7"
-fastapi = "*"
-sqlalchemy = "*"
-asyncpg = "*"
-greenlet = "*"
-psycopg2 = "*"
-uvicorn = {extras = ["standard"], version = "*"}
-pydantic = "*"
+python = "^3.11"
+fastapi = "^0.109.0"
+sqlalchemy = "^2.0.27"
+asyncpg = "^0.29.0"
+greenlet = "^3.0.3"
+psycopg2 = "^2.9.9"
+uvicorn = {extras = ["standard"], version = "^0.27.0"}
+pydantic = "^2.6.1"
+pydantic-settings = "^2.1.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "*"
-httpx = "*"
-pytest-asyncio = "*"
+pytest = "^8.0.0"
+httpx = "^0.26.0"
+pytest-asyncio = "^0.23.5"
 
 [build-system]
 requires = ["poetry-core"]

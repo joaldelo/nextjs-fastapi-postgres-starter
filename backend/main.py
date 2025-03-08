@@ -3,22 +3,30 @@ from seed import seed_user_if_needed
 from app.api import router as api_router
 from app.websocket import handle_websocket
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.settings import settings
+from app.core.startup import log_startup_config
+from app.core.logging import logger
 
+# Log configuration on startup
+log_startup_config()
+
+# Initialize database with seed data
 seed_user_if_needed()
 
-app = FastAPI(title="Chatbot API", description="Backend API for chatbot application")
+app = FastAPI(title=settings.PROJECT_NAME)
+
 
 # Add CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], #TODO: Change to specific origins
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Include the API router
-app.include_router(api_router, prefix="/api/v1", tags=["chatbot"])
+app.include_router(api_router, prefix=settings.API_V1_STR, tags=["chatbot"])
 
 # WebSocket endpoint
 @app.websocket("/ws/threads/{thread_id}")
@@ -27,4 +35,6 @@ async def websocket_endpoint(websocket: WebSocket, thread_id: int):
 
 @app.get("/")
 async def root():
+    logger.debug("Debug test: Root endpoint called")
+    logger.info("Info test: Root endpoint called")
     return {"message": "Welcome to the Chatbot API"}
