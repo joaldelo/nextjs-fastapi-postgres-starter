@@ -8,3 +8,60 @@ services:
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_DB: "postgres"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # App environment
+      APP_ENV: "development"
+      APP_PORT: "8000"
+      
+      # Database settings
+      APP_POSTGRES_USER: "postgres"
+      APP_POSTGRES_PASSWORD: "postgres"
+      APP_POSTGRES_DB: "postgres"
+      APP_POSTGRES_HOST: "database"
+      APP_POSTGRES_PORT: "5432"
+      
+      # CORS settings
+      APP_BACKEND_CORS_ORIGINS: '["http://localhost:3000", "http://127.0.0.1:3000"]'
+      
+      # Logging settings
+      APP_LOG_LEVEL: "debug"
+      APP_LOG_FORMAT: "json"
+      
+      # Debug settings
+      APP_DEBUG: "true"
+      APP_RELOAD: "true"
+      
+      # Database pool settings
+      APP_DB_POOL_SIZE: "5"
+      APP_DB_MAX_OVERFLOW: "10"
+      APP_DB_POOL_TIMEOUT: "30"
+
+      # Python settings
+      PYTHONPATH: "/app"
+      PYTHONUNBUFFERED: "1"
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: always

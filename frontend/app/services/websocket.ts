@@ -68,7 +68,7 @@ export class WebSocketService {
 
   private async establishConnection(threadId: number, onMessage: (message: Message) => void): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.ws = new WebSocket(`ws://localhost:8000/ws/threads/${threadId}`);
+      this.ws = new WebSocket(`ws://localhost:8000/api/v1/ws/threads/${threadId}`);
 
       const connectionTimeout = setTimeout(() => {
         reject(new Error('WebSocket connection timeout'));
