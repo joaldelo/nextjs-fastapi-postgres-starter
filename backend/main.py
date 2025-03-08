@@ -1,7 +1,6 @@
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI
 from seed import seed_user_if_needed
 from app.api import router as api_router
-from app.websocket import handle_websocket
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.settings import settings
 from app.core.startup import log_startup_config
@@ -15,7 +14,6 @@ seed_user_if_needed()
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
-
 # Add CORS middleware configuration
 app.add_middleware(
     CORSMiddleware,
@@ -27,11 +25,6 @@ app.add_middleware(
 
 # Include the API router
 app.include_router(api_router, prefix=settings.API_V1_STR, tags=["chatbot"])
-
-# WebSocket endpoint
-@app.websocket("/ws/threads/{thread_id}")
-async def websocket_endpoint(websocket: WebSocket, thread_id: int):
-    await handle_websocket(websocket, thread_id)
 
 @app.get("/")
 async def root():

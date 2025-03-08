@@ -16,7 +16,7 @@ class SimpleChatbot:
             "Here's what you need to know about that..."
         ]
     
-    def generate_response(self, user_message: str, conversation_history: List[dict]) -> str:
+    async def generate_response(self, user_message: str, conversation_history: List[dict]) -> str:
         """
         Generate a simple response based on the user's message and conversation history.
         In a real implementation, this would be replaced with actual AI/ML logic.

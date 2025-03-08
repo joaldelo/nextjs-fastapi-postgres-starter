@@ -173,8 +173,8 @@ Note: WebSocket endpoints (used for real-time chat) are not visible in the Swagg
 The real-time chat functionality is implemented using WebSocket protocol. Here's how the chat flow works:
 
 1. Connection Setup:
-   - Frontend establishes a WebSocket connection to `/ws/threads/{thread_id}`
-   - Backend validates the thread exists in the database
+   - Frontend establishes a WebSocket connection to `/api/v1/ws/threads/{thread_id}`
+   - Backend validates database session and thread existence
    - A singleton WebSocketService manages all connections
 
 2. Message Flow:
@@ -213,17 +213,25 @@ The real-time chat functionality is implemented using WebSocket protocol. Here's
    - Each thread maintains its own set of WebSocket connections
    - Supports multiple clients viewing the same thread
    - Optimistic updates for better UX (temporary messages shown before confirmation)
+   - Standardized error handling and response formatting
+   - Automatic cleanup of failed connections
+   - Improved type safety with comprehensive type hints
 
 5. Connection Lifecycle:
    ```typescript
    // Connection URL
-   ws://localhost:8000/ws/threads/${threadId}
+   ws://localhost:8000/api/v1/ws/threads/${threadId}
 
    // Connection States
    - Connecting: Initial WebSocket connection attempt (5s timeout)
    - Connected: Successfully connected to thread
    - Reconnecting: Attempting to reconnect (exponential backoff)
    - Disconnected: Connection closed or failed
+
+   // Error Codes
+   - 4003: Database session inactive
+   - 4004: Thread not found
+   - 4005: Critical connection error
    ```
 
 6. Error Handling & Recovery:
@@ -234,6 +242,8 @@ The real-time chat functionality is implemented using WebSocket protocol. Here's
    - Thread validation on connection
    - Message validation and error logging
    - Optimistic message rollback on errors
+   - Standardized error responses with error codes
+   - Graceful handling of failed connections
 
 7. Advanced Features:
    - Connection pooling per thread
@@ -243,6 +253,9 @@ The real-time chat functionality is implemented using WebSocket protocol. Here's
    - Automatic cleanup of disconnected clients
    - Optimistic UI updates
    - Message deduplication
+   - Type-safe message handling
+   - Comprehensive error logging
+   - Standardized response formatting
 
 8. Example Frontend Usage:
    ```typescript
